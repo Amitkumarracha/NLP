@@ -113,8 +113,8 @@ Advanced emotion recognition system using multiple models:
 - Text Mode: DistilRoBERTa emotion classifier
 - Multi-modal ensemble for robust predictions
 """
-API_HOST = "0.0.0.0"
-API_PORT = 8000
+API_HOST = os.getenv("HOST", "0.0.0.0")
+API_PORT = int(os.getenv("PORT", 8000))
 
 # CORS settings
 CORS_ORIGINS = [

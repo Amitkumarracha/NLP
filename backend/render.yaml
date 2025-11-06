@@ -1,0 +1,19 @@
+services:
+  - type: web
+    name: beyond-words-backend
+    runtime: python
+    region: oregon
+    plan: free
+    branch: master
+    buildCommand: "pip install --upgrade pip && pip install -r requirements.txt"
+    startCommand: "uvicorn app:app --host 0.0.0.0 --port $PORT"
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.0
+      - key: DATABASE_URL
+        sync: false
+      - key: DB_TYPE
+        value: postgresql
+      - key: WHISPER_MODEL_SIZE
+        value: tiny
+    healthCheckPath: /health
