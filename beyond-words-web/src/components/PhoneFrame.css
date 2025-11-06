@@ -1,0 +1,7 @@
+/* src/components/PhoneFrame.css */
+.phone-shell {
+  background: transparent;
+  border-radius: 28px;
+  padding: 10px;
+  display: inline-block;
+}
