@@ -8,7 +8,7 @@
 // service worker, and the Workbox build step will be skipped.
 
 import { clientsClaim } from 'workbox-core';
-import { ExpiringCache } from 'workbox-expiration';
+import { ExpirationPlugin } from 'workbox-expiration';
 import { precacheAndRoute, createHandlerBoundToURL } from 'workbox-precaching';
 import { registerRoute } from 'workbox-routing';
 import { StaleWhileRevalidate } from 'workbox-strategies';
@@ -61,7 +61,7 @@ registerRoute(
     plugins: [
       // Ensure that once this runtime cache reaches a maximum size the
       // least-recently used images are removed.
-      new ExpiringCache({ maxEntries: 50 }),
+      new ExpirationPlugin({ maxEntries: 50 }),
     ],
   })
 );
