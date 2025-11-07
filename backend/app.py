@@ -48,16 +48,30 @@ app.add_middleware(
 # =====================================================
 # STARTUP EVENT - LOAD ALL MODELS
 # =====================================================
+# Track model loading state
+models_loaded = False
+
 @app.on_event("startup")
 async def startup_event():
     """Initialize all ML models on application startup"""
+    global models_loaded
     logger.info("\n🚀 Starting Beyond Words API...")
+    logger.info("⏳ Models will load in background...\n")
+    # Don't block startup - load models asynchronously
+    import asyncio
+    asyncio.create_task(load_models_async())
+
+async def load_models_async():
+    """Load models asynchronously after server starts"""
+    global models_loaded
     try:
+        logger.info("📦 Loading models in background...")
         initialize_all_models()
+        models_loaded = True
         logger.info("✅ All models loaded successfully\n")
     except Exception as e:
         logger.error(f"❌ Failed to load models: {e}")
-        raise
+        logger.warning("⚠️  API running in limited mode")
 
 # =====================================================
 # API ROUTES
@@ -70,7 +84,8 @@ def health_check():
         "status": "ok",
         "service": "Beyond Words Emotion Detection API",
         "timestamp": datetime.utcnow().isoformat(),
-        "version": "2.0.0"
+        "version": "2.0.0",
+        "models_loaded": models_loaded
     }
 
 @app.post("/analyze_text", response_model=TextEmotionResponse)
@@ -84,6 +99,9 @@ async def analyze_text_endpoint(request: TextEmotionRequest):
     Returns:
         TextEmotionResponse with emotion, confidence, and suggestions
     """
+    if not models_loaded:
+        raise HTTPException(status_code=503, detail="Models are still loading, please try again in a moment")
+    
     text = request.text
     
     try:
@@ -122,6 +140,9 @@ async def chat_endpoint(request: ChatRequest):
     Returns:
         ChatResponse with bot response, detected emotion, and confidence
     """
+    if not models_loaded:
+        raise HTTPException(status_code=503, detail="Models are still loading, please try again in a moment")
+    
     try:
         user_message = request.message
         emotion_context = request.emotion_context
@@ -157,6 +178,9 @@ async def predict_emotion_endpoint(file: UploadFile = File(...)):
     Returns:
         EmotionResponse with all prediction results
     """
+    if not models_loaded:
+        raise HTTPException(status_code=503, detail="Models are still loading, please try again in a moment")
+    
     try:
         audio_bytes = await file.read()
         
