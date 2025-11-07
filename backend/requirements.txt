@@ -47,6 +47,7 @@ motor==3.3.2  # Async MongoDB driver
 matplotlib==3.8.2
 seaborn==0.13.0
 scikit-plot==0.3.7
+pandas>=2.0.0
 
 # Utilities
 python-dotenv==1.0.0  # Environment variables
