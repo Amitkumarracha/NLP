@@ -5,7 +5,7 @@ services:
     region: oregon
     plan: free
     branch: master
-    buildCommand: "pip install --upgrade pip && pip install -r requirements.txt"
+    buildCommand: "pip install --upgrade pip && pip install -r requirements.light.txt"
     startCommand: "uvicorn app:app --host 0.0.0.0 --port $PORT"
     envVars:
       - key: PYTHON_VERSION
@@ -16,4 +16,6 @@ services:
         value: postgresql
       - key: WHISPER_MODEL_SIZE
         value: tiny
+      - key: LIGHTWEIGHT_MODE
+        value: "true"
     healthCheckPath: /health

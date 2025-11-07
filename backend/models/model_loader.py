@@ -2,6 +2,7 @@
 Machine Learning model loader and initializer
 Loads XGBoost, text emotion classifier, Whisper, and conversational models
 """
+import os
 import pickle
 import numpy as np
 import xgboost as xgb
@@ -13,6 +14,9 @@ from config import (
     XGB_PATH, META_PATH, TEXT_EMOTION_MODEL, 
     CONVERSATIONAL_MODEL, WHISPER_MODEL_SIZE
 )
+
+# Check if running in lightweight mode (for low-memory environments)
+LIGHTWEIGHT_MODE = os.getenv('LIGHTWEIGHT_MODE', 'false').lower() == 'true'
 
 # Global model instances
 xgb_model = None
@@ -98,6 +102,11 @@ def load_whisper_model():
     """Load Whisper speech-to-text model"""
     global whisper_model
     
+    if LIGHTWEIGHT_MODE:
+        print("⚠️  Lightweight mode: Skipping Whisper model")
+        whisper_model = None
+        return None
+    
     if not TRANSFORMER_AVAILABLE:
         whisper_model = None
         return None
@@ -115,6 +124,12 @@ def load_whisper_model():
 def load_mental_health_model():
     """Load conversational model for mental health support"""
     global mental_health_model, mental_health_tokenizer
+    
+    if LIGHTWEIGHT_MODE:
+        print("⚠️  Lightweight mode: Skipping conversational model")
+        mental_health_model = None
+        mental_health_tokenizer = None
+        return None, None
     
     if not TRANSFORMER_AVAILABLE:
         mental_health_model = None
@@ -143,6 +158,11 @@ def load_mental_health_model():
 
 def initialize_all_models():
     """Initialize all models at startup"""
+    if LIGHTWEIGHT_MODE:
+        print("📦 Running in LIGHTWEIGHT MODE (512MB RAM limit)")
+        print("   - Only loading XGBoost and text emotion models")
+        print("   - Skipping Whisper and conversational models")
+    
     check_transformer_availability()
     load_xgboost_model()
     load_text_emotion_model()
